@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import "./App.css";
+import NumberFormat from 'react';
 
 
 
@@ -12,16 +13,73 @@ const App = () => {
     const [total, setTotal] = useState(false);
 
     const inputNum = e => {
+      if(curState.includes(".") && e.target.innerText === ".") return; //avoiding multiple decimal point
 
-    }
+      if(total) {
+        setPreState("")
+      }
 
-    const operatorType = e => {
+      curState ? setCurState((pre) => pre + e.target.innerText) : setCurState(e.target.innerText);
+      setTotal(false);
+    };
 
-    }
+    useEffect(() => {
+      setInput(curState)
+    }, [curState])
 
-    const equals = e => {
+    useEffect(() => {
+      setInput("0");
+    }, []);
 
-    }
+    const operatorType = (e) => {
+        setTotal(false)
+        setOperator(e.target.innerText);
+        if(curState === "") return 
+        if(preState !== "") {
+          equals();
+        } else{
+          setPreState(curState)
+          setCurState("")
+        }
+    };
+
+    const equals = (e) => {
+        if(e.target.innerText === "="){
+          setTotal(true);
+        }
+
+        let cal;
+        switch (operator) {
+          case "/":
+            cal = String(parseFloat(preState) / parseFloat(curState));
+            break;
+    
+          case "+":
+            cal = String(parseFloat(preState) + parseFloat(curState));
+            break;
+    
+          case "X":
+            cal = String(parseFloat(preState) * parseFloat(curState));
+            break;
+    
+          case "-":
+            cal = String(parseFloat(preState) - parseFloat(curState));
+            break;
+    
+          default: 
+            return
+        }
+
+        setInput("");
+        setPreState(cal);
+        setCurState("");
+    };
+
+   
+
+
+
+    
 
     const minusPlus = () => {
       
@@ -32,13 +90,28 @@ const App = () => {
     }
 
     const reset = () => {
-      
+        setPreState("")
+        setCurState("")
+        setInput("0");
     }
 
   return (
     <div className="container">
       <div className="wrapper">
         <div className="screen">
+        {input !== "" || input === "0" ? (
+          <NumberFormat  
+            value={input} 
+            displayType={'text'} 
+            thousandSeparator={true} 
+           /> 
+         ) : ( 
+           <NumberFormat 
+            value={preState} 
+            displayType={'text'} 
+            thousandSeparator={true}
+            />
+         )}    
         </div>
         <div className="btn light-gray" onClick={reset}>AC</div>
         <div className="btn light-gray" onClick={percent}>%</div>
